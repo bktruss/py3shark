@@ -2,7 +2,7 @@
 
 This is a fork of pyshark supporting python3, install via `pip install py3shark`, use as pyshark!
 
-[![Join the chat at https://gitter.im/pyshark_gitter/Lobby](https://badges.gitter.im/pyshark_gitter/Lobby.svg)](https://gitter.im/pyshark_gitter/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/KimiNewt/pyshark.svg)](https://travis-ci.org/KimiNewt/pyshark)
+[![Join the chat at https://gitter.im/pyshark_gitter/Lobby](https://badges.gitter.im/pyshark_gitter/Lobby.svg)](https://gitter.im/pyshark_gitter/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/laixintao/py3shark.svg)](https://travis-ci.org/laixintao/py3shark)
 
 Python wrapper for tshark, allowing python packet parsing using wireshark dissectors.
 
