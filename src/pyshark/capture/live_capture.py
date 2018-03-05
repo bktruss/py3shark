@@ -89,7 +89,7 @@ class LiveCapture(Capture):
         self._created_new_process(dumpcap_params, dumpcap_process, process_name="Dumpcap")
 
         tshark = await super(LiveCapture, self)._get_tshark_process(packet_count=packet_count, stdin=read)
-        raise tshark
+        return tshark
 
     # Backwards compatibility
     sniff = Capture.load_packets
