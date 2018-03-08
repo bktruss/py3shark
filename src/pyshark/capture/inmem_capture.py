@@ -92,7 +92,7 @@ class InMemCapture(Capture):
         """
         return self.parse_packets([binary_packet])[0]
 
-    def parse_packets(self, binary_packets):
+    async def parse_packets(self, binary_packets):
         """
         Parses binary packets and return a list of parsed packets.
 
@@ -104,7 +104,7 @@ class InMemCapture(Capture):
         parsed_packets = []
 
         if not self._current_tshark:
-            self.eventloop.run_until_complete(self._get_tshark_process())
+            await self._get_tshark_process()
         for binary_packet in binary_packets:
             self._write_packet(binary_packet)
 
@@ -113,7 +113,7 @@ class InMemCapture(Capture):
             if len(parsed_packets) == len(binary_packets):
                 raise StopCapture()
 
-        self.eventloop.run_until_complete(self._get_parsed_packet_from_tshark(callback))
+        await self._get_parsed_packet_from_tshark(callback)
         return parsed_packets
 
     async def _get_parsed_packet_from_tshark(self, callback):
@@ -131,29 +131,8 @@ class InMemCapture(Capture):
         self._current_tshark = None
         super(InMemCapture, self).close()
 
-    def feed_packet(self, binary_packet, linktype=LinkTypes.ETHERNET):
-        """
-        DEPRECATED. Use parse_packet instead.
-        This function adds the packet to the packets list, and also closes and reopens tshark for
-        each packet.
-        ==============
 
-        Gets a binary (string) packet and parses & adds it to this capture.
-        Returns the added packet.
-
-        Use feed_packets if you have multiple packets to insert.
-
-        By default, assumes the packet is an ethernet packet. For another link type, supply the linktype argument (most
-        can be found in the class LinkTypes)
-        """
-        warnings.warn("Deprecated method. Use InMemCapture.parse_packet() instead.")
-        self._current_linktype = linktype
-        pkt = self.parse_packet(binary_packet)
-        self.close()
-        self._packets.append(pkt)
-        return pkt
-
-    def feed_packets(self, binary_packets, linktype=LinkTypes.ETHERNET):
+    async def feed_packets(self, binary_packets, linktype=LinkTypes.ETHERNET):
         """
         Gets a list of binary packets, parses them using tshark and returns their parsed values.
         Keeps the packets in the internal packet list as well.
@@ -162,7 +141,7 @@ class InMemCapture(Capture):
         can be found in the class LinkTypes)
         """
         self._current_linktype = linktype
-        parsed_packets = self.parse_packets(binary_packets)
+        parsed_packets = await self.parse_packets(binary_packets)
         self._packets.extend(parsed_packets)
-        self.close()
+        self.loaded=True
         return parsed_packets

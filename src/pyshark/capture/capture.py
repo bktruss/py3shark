@@ -368,7 +368,7 @@ class Capture(object):
                     process_name, ' '.join(parameters)))
         self._running_processes.add(process)
 
-    async def _cleanup_subprocess(self, process):
+    def _cleanup_subprocess(self, process):
         """
         Kill the given process and properly closes any pipes connected to it.
         """
@@ -388,17 +388,11 @@ class Capture(object):
                                        'Try rerunning in debug mode [ capture_obj.set_debug() ] or try updating tshark.'
                                        % process.returncode)
 
-    def close(self):
-        self.eventloop.run_until_complete(self._close_async())
-
-    async def _close_async(self):
-        for process in self._running_processes:
-            await self._cleanup_subprocess(process)
-        self._running_processes.clear()
-
     def __del__(self):
         if self._running_processes:
-            self.close()
+            for process in self._running_processes:
+                self._cleanup_subprocess(process)
+        self._running_processes.clear()
 
     def get_parameters(self, packet_count=None):
         """
