@@ -235,9 +235,9 @@ class Capture(object):
         coro = self.packets_from_tshark(callback, packet_count=packet_count)
         if timeout is not None:
             coro = asyncio.wait_for(coro, timeout)
-        return self.eventloop.run_until_complete(coro)
+        return asyncio.ensure_future(coro)
 
-    async def packets_from_tshark(self, packet_callback, packet_count=None, close_tshark=True):
+    async def packets_from_tshark(self, packet_callback, packet_count=None):
         """
         A coroutine which creates a tshark process, runs the given callback on each packet that is received from it and
         closes the process when it is done.
@@ -249,11 +249,7 @@ class Capture(object):
             await self._go_through_packets_from_fd(tshark_process.stdout, packet_callback, packet_count=packet_count)
         except StopCapture:
             pass
-        finally:
-            if close_tshark:
-                await self._close_async()
-                #yield From(self._cleanup_subprocess(tshark_process))
-
+            
     async def _go_through_packets_from_fd(self, fd, packet_callback, packet_count=None):
         """A coroutine which goes through a stream and calls a given callback for each XML packet seen in it."""
         packets_captured = 0
